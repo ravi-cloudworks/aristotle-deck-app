@@ -301,8 +301,8 @@ async function startPresentation() {
             video.src = slide.videoUrl;
             video.controls = false; // Remove controls for fullscreen
             video.preload = 'auto';
-            video.autoplay = true;
-            video.muted = false; // Required for autoplay in most browsers
+            video.autoplay = false; // Don't autoplay immediately
+            video.muted = false;
             video.loop = false;
 
             // Let Reveal.js handle video sizing
@@ -326,7 +326,13 @@ async function startPresentation() {
         progress: true,
         center: true,
         hash: false,
-        transition: 'slide'
+        transition: 'slide',
+        width: '100%',
+        height: '100%',
+        margin: 0,
+        minScale: 0.1,
+        maxScale: 3.0,
+        backgroundTransition: 'none'
     });
 
     await state.revealInstance.initialize();
@@ -349,13 +355,25 @@ async function startPresentation() {
                 currentSlide._video.play().catch(e => {
                     console.log('Video autoplay failed:', e);
                 });
-            }, 300);
+            }, 500);
         }
     });
+
+    // Auto-play video on first slide if it's a video
+    setTimeout(() => {
+        const firstSlide = document.querySelector('#reveal-slides section');
+        if (firstSlide && firstSlide._video) {
+            firstSlide._video.currentTime = 0;
+            firstSlide._video.play().catch(e => {
+                console.log('Video autoplay failed:', e);
+            });
+        }
+    }, 1000);
     
     // Enter fullscreen after a small delay to ensure everything is loaded
     setTimeout(() => {
         enterFullscreen();
+        setupExitHintAndButton();
     }, 100);
 }
 
@@ -448,6 +466,43 @@ function exitFullscreen() {
             document.mozCancelFullScreen();
         }
     }
+}
+
+// Setup exit hint and button auto-hide functionality
+function setupExitHintAndButton() {
+    const exitBtn = document.getElementById('exit-presentation');
+    const exitHint = document.getElementById('exit-hint');
+    let mouseTimer;
+
+    // Show hint initially, hide after 3 seconds
+    setTimeout(() => {
+        exitHint.classList.add('hidden');
+    }, 3000);
+
+    // Mouse move handler
+    function onMouseMove() {
+        exitBtn.classList.add('visible');
+
+        // Clear existing timer
+        clearTimeout(mouseTimer);
+
+        // Set timer to hide button after 3 seconds of no movement
+        mouseTimer = setTimeout(() => {
+            exitBtn.classList.remove('visible');
+        }, 3000);
+    }
+
+    // Add mouse move listener to presentation view
+    const presentationView = document.getElementById('presentation-view');
+    presentationView.addEventListener('mousemove', onMouseMove);
+
+    // Show button initially
+    exitBtn.classList.add('visible');
+
+    // Hide button after 3 seconds initially
+    setTimeout(() => {
+        exitBtn.classList.remove('visible');
+    }, 3000);
 }
 
 // Generate unique ID

@@ -452,11 +452,52 @@ body {
     width: 100vw;
     height: 100vh;
     position: relative;
+    background: #000;
 }
 
 .reveal {
     width: 100%;
     height: 100%;
+}
+
+/* Remove any borders from reveal.js */
+.reveal .slides {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.reveal .slides section {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    outline: none !important;
+}
+
+/* Remove reveal.js progress bar and controls borders */
+.reveal .progress {
+    border: none !important;
+    outline: none !important;
+}
+
+.reveal .controls {
+    border: none !important;
+    outline: none !important;
+}
+
+/* Remove any focus outlines */
+.reveal *:focus {
+    outline: none !important;
+    border: none !important;
+}
+
+/* Override reveal.js theme borders */
+.reveal .slides section,
+.reveal .slides section > section {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    background: none !important;
 }
 
 .exit-btn {
@@ -472,29 +513,45 @@ body {
     font-size: 14px;
     font-weight: bold;
     z-index: 1000;
-    transition: all 0.3s ease;
+    transition: opacity 0.5s ease;
+    opacity: 0;
 }
 
 .exit-btn:hover {
     background: rgba(255, 255, 255, 0.2);
 }
 
-/* Reveal.js custom styles */
-.reveal .slides section {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.exit-btn.visible {
+    opacity: 1;
 }
 
-.reveal .slides section canvas {
-    max-width: 95vw;
-    max-height: 95vh;
-    object-fit: contain;
+/* Exit hint text */
+.exit-hint {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px 40px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    z-index: 2000;
+    transition: opacity 0.5s ease;
+    opacity: 1;
+    pointer-events: none;
 }
 
+.exit-hint.hidden {
+    opacity: 0;
+}
+
+/* Reveal.js custom styles - minimal overrides */
+.reveal .slides section canvas,
 .reveal .slides section video {
-    max-width: 95vw;
-    max-height: 95vh;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
 }
 
